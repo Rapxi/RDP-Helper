@@ -34,7 +34,7 @@ try {
     f.Close()
 
     if sig != "MZ"
-        throw Error("Download failed: file is not a valid EXE.")
+        throw Error("Download failed: file is not a valid ahk.")
 
 } catch Error as e {
     MsgBox "Updater error:`n" e.Message
