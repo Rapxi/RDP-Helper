@@ -1,7 +1,7 @@
 
 if (-not ([Security.Principal.WindowsPrincipal] `
-    [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-    [Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+            [Security.Principal.WindowsBuiltInRole]::Administrator)) {
 
     Start-Process powershell "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
@@ -18,10 +18,10 @@ $password = Read-Host "Enter the password for this user" -AsSecureString
 if (-not (Get-LocalUser -Name $username -ErrorAction SilentlyContinue)) {
     try {
         New-LocalUser -Name $username `
-                      -Password $password `
-                      -PasswordNeverExpires `
-                      -AccountNeverExpires `
-                      -ErrorAction Stop
+            -Password $password `
+            -PasswordNeverExpires `
+            -AccountNeverExpires `
+            -ErrorAction Stop
         Write-Host "User created successfully." -ForegroundColor Green
     }
     catch {
@@ -32,9 +32,6 @@ else {
     Write-Host "User already exists. Skipping creation." -ForegroundColor Yellow
 }
 
-# Convert SecureString to plain text for logging
-$plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-                    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
 
 # Add to Administrators group
 Add-LocalGroupMember -Group "Administrators" -Member $username -ErrorAction SilentlyContinue
