@@ -1,4 +1,5 @@
 
+# Self-elevate if not admin
 if (-not ([Security.Principal.WindowsPrincipal] `
     [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
     [Security.Principal.WindowsBuiltInRole]::Administrator)) {
@@ -8,11 +9,12 @@ if (-not ([Security.Principal.WindowsPrincipal] `
 }
 
 Write-Host "Running as Administrator..." -ForegroundColor Green
+Write-Host ""
+Write-Host "Please write down the username and password for future use" -ForegroundColor Yellow
 
-Write-Host "Please write down the username and password for future use"
+# Prompt for username + password
 $username = Read-Host "Enter the username to create"
 $password = Read-Host "Enter the password for this user" -AsSecureString
-
 
 # Create local user if not exists
 if (-not (Get-LocalUser -Name $username -ErrorAction SilentlyContinue)) {
@@ -25,38 +27,37 @@ if (-not (Get-LocalUser -Name $username -ErrorAction SilentlyContinue)) {
         Write-Host "User created successfully." -ForegroundColor Green
     }
     catch {
-        Write-Host "Failed to create user." -ForegroundColor Yellow
+        Write-Host "Failed to create user." -ForegroundColor Red
+        exit
     }
 }
 else {
     Write-Host "User already exists. Skipping creation." -ForegroundColor Yellow
 }
 
-# Convert SecureString to plain text for logging
-$plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-                    [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
-
 # Add to Administrators group
 Add-LocalGroupMember -Group "Administrators" -Member $username -ErrorAction SilentlyContinue
 Write-Host "User added to Administrators group." -ForegroundColor Green
 
-
-# Enable Remote Desktop
+# Enable Remote Desktop (local setting)
 Set-ItemProperty `
     -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' `
     -Name 'fDenyTSConnections' `
     -Value 0
 
-# Enable firewall rule for RDP
+# Enforce via Local Policy (stronger method)
+New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Force | Out-Null
+
+Set-ItemProperty `
+    -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" `
+    -Name "fDenyTSConnections" `
+    -Value 0
+ 
+# Enable firewall rules
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-# Restart Remote Desktop Service
 Restart-Service -Name TermService -Force
 
-Write-Host "Remote Desktop enabled." -ForegroundColor Green
-
-# Update Group Policy
-gpupdate /force
-
-Write-Host "Group Policy updated." -ForegroundColor Green
+Write-Host ""
+Write-Host "Remote Desktop enabled successfully." -ForegroundColor Green
 Write-Host "Setup complete." -ForegroundColor Cyan

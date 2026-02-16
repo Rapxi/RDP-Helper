@@ -36,6 +36,7 @@ Script() {
             global SaveCompleted := true  ; Set flag when save completes
 
         }
+        MsgBox("Please restart your pc ")
     }
     RunWait UPGuis()
 }
