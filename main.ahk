@@ -4,12 +4,40 @@
 CoordMode("Pixel", "Client")
 
 MyGui := Gui()
-MyGui.Show("w400 h150")
+MyGui.Show("w400 h200")
 ScriptBtn := MyGui.Add("Button", "x20 y20 w360 h30", "Create An Admin")
 ScriptBtn.OnEvent("Click", (*) => Script())
 Script() {
     psScript := A_ScriptDir "\Admin-Policy.ps1"
-    Run '*RunAs powershell.exe  -ExecutionPolicy Bypass -File "' psScript '"'
+    RunWait '*RunAs powershell.exe  -ExecutionPolicy Bypass -File "' psScript '"'
+
+    MsgBox("Please Note this is only for saving one profile.")
+    UPGuis() {
+        UPGui := Gui()
+        UPGui.Show("w200 h150")
+        MyGui.Hide()
+
+        UserGui := UPGui.Add("Text", "x20 y10 w160 h30", "Username")
+        UserInput := UPGui.Add("Edit", "x20 y30 w160 h30")
+
+        PassGui := UPGui.Add("Text", "x20 y70 w160 h30", "Password")
+        PassInput := UPGui.Add("Edit", "x20 y90 w160 h30")
+
+        SaveBtn := UPGui.Add("Button", "x20 y120 w160 h30", "Save")
+        SaveBtn.OnEvent("Click", (*) => Save())
+        Save() {
+            FileW := FileOpen(A_ScriptDir "\Profile.txt", "w")
+            FileW.WriteLine(Userinput.Value)
+            FileW.WriteLine(PassInput.Value)
+            FileW.Close()
+            MsgBox("Saved")
+            MyGui.Show()
+            UpGui.Destroy()
+            global SaveCompleted := true  ; Set flag when save completes
+
+        }
+    }
+    RunWait UPGuis()
 }
 WrapperBtn := MyGui.Add("Button", "x20 y60 w360 h30", "Update RDP Wrapper")
 WrapperBtn.OnEvent("Click", (*) => Wrapper())
@@ -23,4 +51,97 @@ AppBtn.OnEvent("Click", (*) => App())
 App() {
     AppScript := A_ScriptDir "\Application.ps1"
     RunWait '*RunAs powershell.exe -ExecutionPolicy Bypass -File "' AppScript '"'
+    sleep 200
+    Run "C:\Users\" A_UserName "\Downloads\rdp.exe"
+    sleep 2000
+    WinActivate("ahk_exe rdp.exe")
+    sleep 500
+    MouseMove(348, 218, 10)
+    sleep 30
+    Click
+    sleep 200
+    MouseMove(48, 322, 10)
+    sleep 30
+    Click
+    sleep 200
+    SendInput("{R}")
+    sleep 30
+    SendInput("{D}")
+    sleep 30
+    SendInput("{P}")
+    sleep 200
+    MouseMove(162, 101, 10)
+    sleep 30
+    Click
+
+    FileR := FileOpen(A_ScriptDir "\Profile.txt", "r")
+    User := FileR.ReadLine()
+    Pass := FileR.ReadLine()
+    FileR.Close()
+    UserArr := StrSplit(User)
+    for index, value in UserArr {
+        if value = " " {
+            SendInput("{Space}")
+        }
+        SendInput("{" value "}")
+        sleep 30
+    }
+    sleep 200
+    PassInputFunc() {
+        PassArr := StrSplit(Pass)
+        for index, value in PassArr {
+            if value = " " {
+                SendInput("{Space}")
+            }
+            SendInput("{" value "}")
+            sleep 30
+        }
+    }
+    sleep 200
+    MouseMove(162, 124, 10)
+    sleep 30
+    Click
+    PassInputFunc()
+    MouseMove(162, 153, 10)
+    sleep 30
+    Click
+    sleep 200
+    PassInputFunc()
+    sleep 200
+    MouseMove(191, 249, 10)
+    sleep 30
+    Click
+    sleep 200
+    SendInput("{Left}")
+    sleep 30
+    SendInput("{Enter}")
+    sleep 200
+    MouseMove(543, 371, 10)
+    sleep 30
+    Click
+    sleep 200
+    MouseMove(210, 316, 10)
+    sleep 30
+    Click
+    sleep 200
+    MouseMove(288, 403, 10)
+    sleep 30
+    Click
+    sleep 200
 }
+AIOBtn := MyGui.Add("Button", "x20 y160 w360 h30", "All In One")
+AIOBtn.OnEvent("Click", (*) => AIO())
+AIO() {
+    global SaveCompleted := false
+
+    Script()
+    while !SaveCompleted {
+        Sleep 100
+    }
+    Wrapper()
+    App()
+}
+
+
+F3:: ExitApp
+F4:: Reload
