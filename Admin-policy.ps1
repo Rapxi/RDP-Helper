@@ -1,9 +1,7 @@
-
-# Self-elevate if not admin
-
+# Elevate first
 if (-not ([Security.Principal.WindowsPrincipal] `
-            [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-            [Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+        [Security.Principal.WindowsBuiltInRole]::Administrator)) {
 
     Start-Process powershell "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
@@ -11,28 +9,33 @@ if (-not ([Security.Principal.WindowsPrincipal] `
 
 Write-Host "Running as Administrator..." -ForegroundColor Green
 Write-Host ""
-Write-Host "Please write down the username and password for future use" -ForegroundColor Yellow
 
-
-# Prompt for username + password
-
+# Prompt for username and password
 $username = Read-Host "Enter the username to create"
-$password = Read-Host "Enter the password for this user" -AsSecureString
+$password = Read-Host "Enter the password for this user"
 
+# Convert plain-text password to SecureString for creating the user
+$passwordSecure = ConvertTo-SecureString $password -AsPlainText -Force
 
-# Create local user if not exists
+# Save credentials as plain text for AHK .ReadLine() use
+$FilePath = Join-Path $PSScriptRoot "Profile.txt"
+@(
+    $username
+    $password
+) | Set-Content -Path $FilePath -Encoding UTF8
 
+# Create local user if it doesn't exist
 if (-not (Get-LocalUser -Name $username -ErrorAction SilentlyContinue)) {
     try {
         New-LocalUser -Name $username `
-            -Password $password `
+            -Password $passwordSecure `
             -PasswordNeverExpires `
             -AccountNeverExpires `
             -ErrorAction Stop
         Write-Host "User created successfully." -ForegroundColor Green
     }
     catch {
-        Write-Host "Failed to create user." -ForegroundColor Red
+        Write-Host "Failed to create user: $($_.Exception.Message)" -ForegroundColor Red
         exit
     }
 }

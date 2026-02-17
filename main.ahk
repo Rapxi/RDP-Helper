@@ -10,34 +10,7 @@ ScriptBtn.OnEvent("Click", (*) => Script())
 Script() {
     psScript := A_ScriptDir "\Admin-Policy.ps1"
     RunWait '*RunAs powershell.exe  -ExecutionPolicy Bypass -File "' psScript '"'
-
-    MsgBox("Please Note this is only for saving one profile.")
-    UPGuis() {
-        UPGui := Gui()
-        UPGui.Show("w200 h150")
-        MyGui.Hide()
-
-        UserGui := UPGui.Add("Text", "x20 y10 w160 h30", "Username")
-        UserInput := UPGui.Add("Edit", "x20 y30 w160 h30")
-
-        PassGui := UPGui.Add("Text", "x20 y70 w160 h30", "Password")
-        PassInput := UPGui.Add("Edit", "x20 y90 w160 h30")
-
-        SaveBtn := UPGui.Add("Button", "x20 y120 w160 h30", "Save")
-        SaveBtn.OnEvent("Click", (*) => Save())
-        Save() {
-            FileW := FileOpen(A_ScriptDir "\Profile.txt", "w")
-            FileW.WriteLine(Userinput.Value)
-            FileW.WriteLine(PassInput.Value)
-            FileW.Close()
-            MsgBox("Saved")
-            MyGui.Show()
-            UpGui.Destroy()
-            global SaveCompleted := true  ; Set flag when save completes
-
-        }
-    }
-    RunWait UPGuis()
+    global SaveCompleted := true
 }
 WrapperBtn := MyGui.Add("Button", "x20 y60 w360 h30", "Update RDP Wrapper")
 WrapperBtn.OnEvent("Click", (*) => Wrapper())
@@ -48,7 +21,7 @@ Wrapper() {
 
     ListeningScript := A_ScriptDir "\listening-check.ps1"
 
-    exitcode := RunWait('*RunAs powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' ListeningScript '"')
+    exitcode := RunWait('*RunAs powershell.exe  -NoProfile -ExecutionPolicy Bypass -File "' ListeningScript '"')
 
     if !(exitcode = 0) {
         MsgBox("Please Restart your Pc`nClick on the Download RDP++ Button after Restarting")
