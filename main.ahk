@@ -36,7 +36,6 @@ Script() {
             global SaveCompleted := true  ; Set flag when save completes
 
         }
-        MsgBox("Please restart your pc ")
     }
     RunWait UPGuis()
 }
@@ -46,6 +45,15 @@ Wrapper() {
     WrapperScript := A_ScriptDir "\Wrapper.ps1"
     RunWait '*RunAs powershell.exe  -ExecutionPolicy Bypass -File "' WrapperScript '"'
     RunWait '*RunAs "C:\Program Files\RDP Wrapper\autoupdate.bat"'
+
+    ListeningScript := A_ScriptDir "\listening-check.ps1"
+
+    exitcode := RunWait('*RunAs powershell.exe -NoProfile -ExecutionPolicy Bypass -File "' ListeningScript '"')
+
+    if !(exitcode = 0) {
+        MsgBox("Please Restart your Pc`nClick on the Download RDP++ Button after Restarting")
+        ExitApp
+    }
 }
 AppBtn := MyGui.Add("Button", "x20 y100 w360 h30", "Download RDP++")
 AppBtn.OnEvent("Click", (*) => App())
@@ -54,7 +62,8 @@ App() {
     RunWait '*RunAs powershell.exe -ExecutionPolicy Bypass -File "' AppScript '"'
     sleep 200
     Run "C:\Users\" A_UserName "\Downloads\rdp.exe"
-    sleep 2000
+    WinWaitActive("ahk_exe rdp.exe")
+    sleep 500
     WinActivate("ahk_exe rdp.exe")
     sleep 500
     MouseMove(348, 218, 10)
