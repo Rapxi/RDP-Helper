@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2.0.18+
 #SingleInstance Force
-
 CoordMode("Pixel", "Client")
 
 MyGui := Gui()
@@ -105,7 +104,5 @@ AIO() {
     Wrapper()
     App()
 }
-
-
 F3:: ExitApp
 F4:: Reload
