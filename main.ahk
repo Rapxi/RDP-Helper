@@ -28,6 +28,12 @@ Wrapper() {
         ExitApp
     }
 }
+BetterClick(x, y) {
+    MouseMove(x, y, 10)
+    sleep 30
+    Click
+    sleep 200
+}
 AppBtn := MyGui.Add("Button", "x20 y100 w360 h30", "Download RDP++")
 AppBtn.OnEvent("Click", (*) => App())
 App() {
@@ -39,23 +45,15 @@ App() {
     sleep 500
     WinActivate("ahk_exe rdp.exe")
     sleep 500
-    MouseMove(348, 218, 10)
-    sleep 30
-    Click
-    sleep 200
-    MouseMove(48, 322, 10)
-    sleep 30
-    Click
-    sleep 200
+    BetterClick(348, 218)
+    BetterClick(48, 322)
     SendInput("{R}")
     sleep 30
     SendInput("{D}")
     sleep 30
     SendInput("{P}")
     sleep 200
-    MouseMove(162, 101, 10)
-    sleep 30
-    Click
+    BetterClick(162, 101)
 
     FileR := FileOpen(A_ScriptDir "\Profile.txt", "r")
     User := FileR.ReadLine()
@@ -81,36 +79,19 @@ App() {
         }
     }
     sleep 200
-    MouseMove(162, 124, 10)
-    sleep 30
-    Click
+    BetterClick(162, 124)
     PassInputFunc()
-    MouseMove(162, 153, 10)
-    sleep 30
-    Click
-    sleep 200
+    BetterClick(162, 153)
     PassInputFunc()
     sleep 200
     MouseMove(191, 249, 10)
-    sleep 30
-    Click
-    sleep 200
     SendInput("{Left}")
     sleep 30
     SendInput("{Enter}")
     sleep 200
-    MouseMove(543, 371, 10)
-    sleep 30
-    Click
-    sleep 200
-    MouseMove(210, 316, 10)
-    sleep 30
-    Click
-    sleep 200
-    MouseMove(288, 403, 10)
-    sleep 30
-    Click
-    sleep 200
+    BetterClick(543, 371)
+    BetterClick(210, 316)
+    BetterClick(288, 403)
 }
 AIOBtn := MyGui.Add("Button", "x20 y160 w360 h30", "All In One")
 AIOBtn.OnEvent("Click", (*) => AIO())
