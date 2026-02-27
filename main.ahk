@@ -45,6 +45,7 @@ App() {
     WinActivate("ahk_exe rdp.exe")
     sleep 500
     BetterClick(119, 86)
+    BetterClick(120, 86)
     LocalHost := "127.0.0.2"
     LocalHostArr := StrSplit(LocalHost)
     for index, value in LocalHostArr {
