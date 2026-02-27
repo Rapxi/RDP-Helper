@@ -44,6 +44,14 @@ App() {
     sleep 500
     WinActivate("ahk_exe rdp.exe")
     sleep 500
+    BetterClick(119, 86)
+    LocalHost := "127.0.0.2"
+    LocalHostArr := StrSplit(LocalHost)
+    for index, value in LocalHostArr {
+        SendInput("{" value "}")
+        sleep 30
+    }
+    sleep 500
     BetterClick(348, 218)
     BetterClick(48, 322)
     SendInput("{R}")
@@ -63,8 +71,10 @@ App() {
         if value = " " {
             SendInput("{Space}")
         }
-        SendInput("{" value "}")
-        sleep 30
+        else {
+            SendInput("{" value "}")
+            sleep 30
+        }
     }
     sleep 200
     PassInputFunc() {
@@ -73,8 +83,10 @@ App() {
             if value = " " {
                 SendInput("{Space}")
             }
-            SendInput("{" value "}")
-            sleep 30
+            else {
+                SendInput("{" value "}")
+                sleep 30
+            }
         }
     }
     sleep 200

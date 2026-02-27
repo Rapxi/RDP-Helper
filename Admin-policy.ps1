@@ -1,7 +1,7 @@
 # Elevate first
 if (-not ([Security.Principal.WindowsPrincipal] `
-        [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-        [Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+            [Security.Principal.WindowsBuiltInRole]::Administrator)) {
 
     Start-Process powershell "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
@@ -74,6 +74,69 @@ Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
 # Restart RDP service (no reboot required)
 Restart-Service -Name TermService -Force
+
+
+# Create the key if it doesn't exist
+if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services")) {
+    New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Force
+}
+
+# Limit Number of Connections = 999999
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "MaxInstanceCount" -Value 999999 -Type DWord
+
+
+# Run as Administrator
+
+# Auto-detect active network adapter (prefers Ethernet over WiFi)
+$networkAdapter = Get-NetIPAddress -AddressFamily IPv4 |
+Where-Object { $_.IPAddress -notlike "127.*" -and $_.PrefixOrigin -ne "WellKnown" } |
+ForEach-Object {
+    $alias = $_.InterfaceAlias
+    $priority = switch -Wildcard ($alias) {
+        "Ethernet*" { 1 }
+        "Wi-Fi*" { 2 }
+        "Wireless*" { 2 }
+        default { 3 }
+    }
+    [PSCustomObject]@{ Adapter = $_; Priority = $priority }
+} |
+Sort-Object Priority |
+Select-Object -First 1 -ExpandProperty Adapter
+
+# Check something was found
+if (-not $networkAdapter) {
+    Write-Host "No active network adapter found. Exiting." -ForegroundColor Red
+    exit
+}
+
+$localIP = $networkAdapter.IPAddress
+$prefixLength = $networkAdapter.PrefixLength
+$subnet = ($localIP -replace "\.\d+$", ".0") + "/$prefixLength"
+
+# Remove any existing RDP firewall rules to avoid conflicts
+Remove-NetFirewallRule -DisplayName "Remote Desktop*" -ErrorAction SilentlyContinue
+
+# Allow RDP only from the detected internal subnet
+New-NetFirewallRule `
+    -DisplayName "RDP - Internal Only" `
+    -Direction Inbound `
+    -Protocol TCP `
+    -LocalPort 3389 `
+    -RemoteAddress $subnet `
+    -Action Allow `
+    -Profile Any
+
+# Block RDP from everything else
+New-NetFirewallRule `
+    -DisplayName "RDP - Block External" `
+    -Direction Inbound `
+    -Protocol TCP `
+    -LocalPort 3389 `
+    -RemoteAddress "0.0.0.0/0" `
+    -Action Block `
+    -Profile Any
+
+gpupdate /force
 
 Write-Host ""
 Write-Host "Remote Desktop enabled successfully." -ForegroundColor Green
