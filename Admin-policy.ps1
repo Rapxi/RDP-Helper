@@ -85,7 +85,6 @@ if (-not (Test-Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Servi
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" -Name "MaxInstanceCount" -Value 999999 -Type DWord
 
 
-# Run as Administrator
 
 # Auto-detect active network adapter (prefers Ethernet over WiFi)
 $networkAdapter = Get-NetIPAddress -AddressFamily IPv4 |
