@@ -3,7 +3,7 @@
 CoordMode("Pixel", "Client")
 
 MyGui := Gui()
-MyGui.Show("w400 h400")
+MyGui.Show("w400 h440")
 
 ManualGB := MyGui.Add("GroupBox", "x10 y10 w380 h135 Center", "Manual")
 
@@ -16,22 +16,25 @@ WrapperBtn.OnEvent("Click", (*) => Wrapper())
 AppBtn := MyGui.Add("Button", "x20 y110 w360 h30", "Download RDP++")
 AppBtn.OnEvent("Click", (*) => App())
 
-ErrorFixingGB := MyGui.Add("GroupBox", "x10 y150 w380 h175 Center", "Error Fixing")
+CreateFavoriteBtn := MyGui.Add("Button", "x20 y150 w360 h30", "Favorite User")
+CreateFavoriteBtn.OnEvent("Click", (*) => CreateFavorite())
 
-NumberOfConnectionsBtn := MyGui.Add("Button", "x20 y170 w360 h30", "Number Of Connections Fix")
+ErrorFixingGB := MyGui.Add("GroupBox", "x10 y190 w380 h175 Center", "Error Fixing")
+
+NumberOfConnectionsBtn := MyGui.Add("Button", "x20 y210 w360 h30", "Number Of Connections Fix")
 NumberOfConnectionsBtn.OnEvent("Click", (*) => NumberOfConnections())
 
-OpenRDPBtn := MyGui.Add("Button", "x20 y210 w360 h30", "Open RDP++")
+OpenRDPBtn := MyGui.Add("Button", "x20 y250 w360 h30", "Open RDP++")
 OpenRDPBtn.OnEvent("Click", (*) => OpenRDPEXE())
 
-RDPSettingsBtn := MyGui.Add("Button", "x20 y250 w360 h30", "Start RDP")
+RDPSettingsBtn := MyGui.Add("Button", "x20 y290 w360 h30", "Start RDP")
 RDPSettingsBtn.OnEvent("Click", (*) => RDPSETTINGS())
 
-NotListeningBtn := MyGui.Add("Button", "x20 y290 w360 h30", "Not Listening Fix")
+NotListeningBtn := MyGui.Add("Button", "x20 y330 w360 h30", "Not Listening Fix")
 NotListeningBtn.OnEvent("Click", (*) => NotListening())
 
-AutomaticSetupGB := MyGui.Add("GroupBox", "x10 y330 w380 h55 Center", "Automatic Setup")
-AIOBtn := MyGui.Add("Button", "x20 y350 w360 h30", "All In One")
+AutomaticSetupGB := MyGui.Add("GroupBox", "x10 y370 w380 h55 Center", "Automatic Setup")
+AIOBtn := MyGui.Add("Button", "x20 y390 w360 h30", "All In One")
 AIOBtn.OnEvent("Click", (*) => AIO())
 AIO() {
     global SaveCompleted := false
@@ -42,6 +45,8 @@ AIO() {
     }
     Wrapper()
     App()
+    sleep 200
+    BetterClick(288, 403)
 }
 
 NumberOfConnections() {
@@ -57,7 +62,6 @@ RDPEXENOTINSTALLED() {
         RunWait '*RunAs powershell.exe -ExecutionPolicy Bypass -File "' AppScript '"'
         sleep 200
         If FileExist("C:\Users\" A_UserName "\Downloads\rdp.exe") {
-            MsgBox("RDP++ Installed")
             break
         }
         If counter > 9 {
@@ -79,12 +83,7 @@ RDPSETTINGS() {
     sleep 500
     BetterClick(119, 86)
     BetterClick(120, 86)
-    LocalHost := "127.0.0.2"
-    LocalHostArr := StrSplit(LocalHost)
-    for index, value in LocalHostArr {
-        SendInput("{" value "}")
-        sleep 30
-    }
+    SendInput("127.0.0.2")
     sleep 500
     BetterClick(348, 218)
     BetterClick(48, 322)
@@ -100,34 +99,12 @@ RDPSETTINGS() {
     User := FileR.ReadLine()
     Pass := FileR.ReadLine()
     FileR.Close()
-    UserArr := StrSplit(User)
-    for index, value in UserArr {
-        if value = " " {
-            SendInput("{Space}")
-        }
-        else {
-            SendInput("{" value "}")
-            sleep 30
-        }
-    }
-    sleep 200
-    PassInputFunc() {
-        PassArr := StrSplit(Pass)
-        for index, value in PassArr {
-            if value = " " {
-                SendInput("{Space}")
-            }
-            else {
-                SendInput("{" value "}")
-                sleep 30
-            }
-        }
-    }
+    SendInput(User)
     sleep 200
     BetterClick(162, 124)
-    PassInputFunc()
+    SendInput(Pass)
     BetterClick(162, 153)
-    PassInputFunc()
+    SendInput(Pass)
     sleep 200
     MouseMove(191, 249, 10)
     SendInput("{Left}")
@@ -136,7 +113,7 @@ RDPSETTINGS() {
     sleep 200
     BetterClick(543, 371)
     BetterClick(210, 316)
-    BetterClick(288, 403)
+    ; BetterClick(288, 403) Uncomment if you want it to connect automatically
 }
 NotListening() {
     MsgBox("Please restart your pc and press the All in One Button")
@@ -173,7 +150,32 @@ App() {
     RDPEXENOTINSTALLED()
     OpenRDPEXE()
     RDPSETTINGS()
+    CreateFavorite()
+}
+CreateFavorite() {
+    OpenRDPEXE
+    sleep 500
+    WinActivate("ahk_exe rdp.exe")
+    sleep 500
+    BetterClick(330, 410)
+    BetterClick(320, 459)
+    BetterClick(45, 324)
+    BetterClick(205, 55)
+    sleep 200
+    SendInput("{R}")
+    sleep 30
+    SendInput("{D}")
+    sleep 30
+    SendInput("{P}")
+    Sleep 200
+    BetterClick(254, 102)
+    sleep 200
+    SendInput('/v:127.0.0.2 /i:""RDP"" /title:""RDP"" /nodrives /nosound /nowallpaper /o:""keyboardhook:i:1"" /w:1920 /h:1080')
+    sleep 500
+    BetterClick(360, 233)
+    BetterClick(514, 322)
+    BetterClick(354, 81)
+    BetterClick(550, 368)
 }
 F3:: ExitApp
 F4:: Reload
-F9:: RDPEXENOTINSTALLED()
