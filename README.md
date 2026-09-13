@@ -3,7 +3,7 @@
 
 ## Description
 
-This is an tool developed with powershell and ahk (for gui) to set up an RDP without much to do.
+This is an tool developed with powershell (Windows Settings) and ahk (GUI) to set up an RDP without much to do.
 
 
 ## Guide
@@ -11,8 +11,10 @@ This is an tool developed with powershell and ahk (for gui) to set up an RDP wit
 1. Click green "<> Code" Button on Github (top right).
 2. Press Download Zip.
 3. After its downloaded extract it.
-4. Open Main.ahk
-5. Click on the Buttons in order from top to right.
+4. Open Main.bat with Admin
+5. Click on "All in One".
+6. This MAY require a PC restart sometimes.
+- If Specific Errors come up open an Issue or check if the Error is fixable on the "Error Fixing Tab".
 
 
 ## Authors
@@ -25,6 +27,9 @@ ___If you want to contribute please dm me on Discord___
 
 
 # Version History
+
+* 2.0
+    * Complete Rework -> See Changelog.MD
 
 * 1.7
     * Added Favoritung User to Create Shortcut for faster Connection
