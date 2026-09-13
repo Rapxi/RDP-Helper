@@ -1,0 +1,4 @@
+- Put Scripts in their respective Folders.
+- Changed Main.ahk to Main.bat to battle Admin permission issues.
+- Seperated GUI and Logic into GUI.ahk and Functions.ahk 
+- Added LOGS
