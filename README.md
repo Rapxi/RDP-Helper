@@ -29,7 +29,7 @@ ___If you want to contribute please dm me on Discord___
 # Version History
 
 * 2.0
-    * Complete Rework -> See Changelog.MD
+    * Complete Rework -> See Changelog.md
 
 * 1.7
     * Added Favoritung User to Create Shortcut for faster Connection
