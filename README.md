@@ -17,6 +17,10 @@ This is an tool developed with powershell (Windows Settings) and ahk (GUI) to se
 - If Specific Errors come up open an Issue or check if the Error is fixable on the "Error Fixing Tab".
 
 
+## KNOWN ERRORS
+
+- Couldnt find Window setting x: Change Windows Language to English
+
 ## Authors
 
 Contributors  
